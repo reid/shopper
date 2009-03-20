@@ -14,18 +14,6 @@ var IRShopper = function() {
         return document.getElementById(el);
     };
 
-    var onsubmit = function(e) {
-
-        e.preventDefault();
-
-        query(
-            $('item').value,
-            $('min_price').value,
-            $('max_price').value
-        );
-
-    };
-
     var attachEvent = function(ev, el, cb) {
         if (el.addEventListener) {
             el.addEventListener(ev, cb, false);
@@ -34,8 +22,46 @@ var IRShopper = function() {
         }
     };
 
+    var defaultInput = function (args) {
+        var el = $(args.id);
+
+        if (!el) return false;
+
+        if (el.value == '') el.value = args.value;
+        if (args.classBlur) el.className = args.classBlur;
+
+        attachEvent('blur', el, function () {
+            if (el.value !== '') return;
+            el.value = args.value;
+            if (args.classBlur) el.className = args.classBlur;
+        });
+
+        attachEvent('focus', el, function () {
+            if (el.value !== args.value) return;
+            el.value = '';
+            if (args.classFocus) el.className = args.classFocus;
+        });
+    };
+
+
+    var onsubmit = function(e) {
+        e.preventDefault();
+
+        query(
+            $('item').value,
+            $('min_price').value,
+            $('max_price').value
+        );
+    };
+
     var query = function(q, min, max) {
 
+        if (q.length === 0) {
+            $('results').innerHTML = 'Please supply an item name!';
+            return;
+        }
+
+        $('results-status').style.display = 'block';
         $('results').innerHTML = 'Fetching...';
 
         var callback = function(req) {
@@ -54,7 +80,7 @@ var IRShopper = function() {
 
             if (data.count) {
                 $('results').innerHTML = 'Processing ' + data.count + ' items...';
-                results += 'Found ' + data.count + ' items on eBay.';
+                results += 'Found ' + data.count + ' items on eBay. Auctions ending sooner appear first.';
             }
 
             for (; i < l ; i++) {
@@ -63,10 +89,15 @@ var IRShopper = function() {
                 results += '<div class="' + CLASS.item + '">' + markup + '</div>';
             }
 
-            if (results) $('results').innerHTML = results;
+            $('results-status').style.display = 'none';
+
+            if (results) $('results').innerHTML = '<div class="clear"></div>' + results;
 
             $('item').focus();
         };
+
+        if (typeof min !== 'number') min = 0;
+        if (typeof max !== 'number') max = 9999999;
 
         q = encodeURIComponent(q);
         min = encodeURIComponent(min);
@@ -84,13 +115,18 @@ var IRShopper = function() {
     var announce = function() {
 
         var callback = function(req) {
-            $('shop-announce-status').innerHTML = 'Posted!';
+            if (req.hadError()) $('shop-announce-status').innerHTML = 'Not shared, login first!';
         };
 
         $('shop-announce-status').innerHTML = 'Posted!';
 
         var activity = {},
             item = $('item').value;
+
+        if (item.length === 0) {
+            $('shop-announce-status').innerHTML = 'Nothing to share!';
+            return;
+        }
 
         activity[opensocial.Activity.Field.TITLE] = 'Found a great deal on ' + item + ' using Shopper!';
         activity[opensocial.Activity.Field.BODY] = 'Search eBay and get what you want with Shopper!';
@@ -109,8 +145,26 @@ var IRShopper = function() {
         $('results').innerHTML = 'Type an item!';
 
         attachEvent('submit', $('shop'), onsubmit);
-
         attachEvent('click', $('shop-announce'), announce);
+
+        defaultInput({
+            id: 'min_price',
+            value: 'Minimum Price ($)',
+            classFocus: 'shop-focus',
+            classBlur: 'shop-blur'
+        });
+
+        defaultInput({
+            id: 'max_price',
+            value: 'Maximum Price ($)',
+            classFocus: 'shop-focus',
+            classBlur: 'shop-blur'
+        });
+
+        // ImageCache workaround
+        var img = document.createElement('img');
+        img.src = 'http://apps.idearefuge.com/spin.gif';
+        $('results-status').appendChild(img);
 
         $('item').focus();
 
@@ -145,6 +199,7 @@ h1, h2, h3 {
     background: #d4ebe0;
     padding: 15px 15px 10px;
     border-bottom: 1px solid #ccc;
+    letter-spacing: -1px;
 }
 
 #shopper {
@@ -160,20 +215,25 @@ h1, h2, h3 {
     font-style: italic;
 }    
 
-#results {
+#listings {
     padding: 3px 5px 3px;
     border-top: 1px solid #ccc;
 }
 
 #ft {
+    padding: 20px 5px;
     text-align: center;
     text-transform: uppercase;
-    font-size: 90%;
-    color: #bbb;
+    font-size: 70%;
+    color: #ccc;
 }
 
 #ft a {
     color: #bbb;
+}
+
+#ft, .clear {
+    clear: both;
 }
 
 .ebay-item {
@@ -185,6 +245,27 @@ h1, h2, h3 {
     margin: 0;
     font-size: 70%;
     display: block;
+    width: 100px;
+    height: 100px;
+}
+
+.shop-blur {
+    color: #666;
+    text-transform: uppercase;
+}
+
+.shop-focus {
+    color: #000;
+    text-transform: none;
+}
+
+.hide {
+    display: none;
+}
+
+#results-status {
+    margin: 5px auto;
+    text-align: center;
 }
 </style>
 <div id="ir-app">
@@ -194,19 +275,22 @@ h1, h2, h3 {
 <div id="bd">
 <div id="shopper">
 <form id="shop">
-    <label for="item">Item: </label>
+    <label for="item">Find: </label>
     <input type="text" id="item">
-    <label for="min_price">Min: $</label>
-    <input type="text" id="min_price" value="0">
-    <label for="max_price">Max: $</label>
-    <input type="text" id="max_price" value="100000">
+    <label for="min_price" class="hide">Min: $</label>
+    <input type="text" id="min_price" value="" size="14">
+    <label for="max_price" class="hide">Max: $</label>
+    <input type="text" id="max_price" value="" size="14">
     <input type="submit" value="Go!">
     <input type="button" value="Announce" id="shop-announce">
     <span id="shop-announce-status"></span>
 </form>
 </div>
+<div id="listings">
+<div id="results-status" style="display:none;"></div>
 <div id="results">
-Loading...
+Loading application...
+</div>
 </div>
 </div>
 <div id="ft">
