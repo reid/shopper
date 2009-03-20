@@ -200,7 +200,6 @@ h1, h2, h3 {
     background: #d4ebe0;
     padding: 15px 15px 10px;
     border-bottom: 1px solid #ccc;
-    letter-spacing: -1px;
 }
 
 #shopper {
@@ -212,8 +211,14 @@ h1, h2, h3 {
     margin: 0;
 }
 
-#ir-app h1 {
+h1 {
+    letter-spacing: -1px;
+}
+
+#ir-app h1, #hd span {
     font-style: italic;
+    display: inline;
+    padding-right: 5px;
 }    
 
 #listings {
@@ -272,6 +277,7 @@ h1, h2, h3 {
 <div id="ir-app">
 <div id="hd">
 <h1>Shopper!</h1>
+<span>Fast visual eBay shopping</span>
 </div>
 <div id="bd">
 <div id="shopper">
