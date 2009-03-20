@@ -61,17 +61,15 @@ var IRShopper = function() {
             return;
         }
 
-        $('results-status').style.display = 'block';
-        $('results').innerHTML = 'Fetching...';
+        $('results-status').style.display = 'inline';
+        $('shop-announce-status').innerHTML = 'Fetching...';
 
         var callback = function(req) {
 
-            $('results').innerHTML = 'Processing...';
+            $('shop-announce-status').innerHTML = 'Processing...';
 
             var data = req.data;
             if (!data) $('results').innerHTML = 'No items, try again?';
-
-            console.log(data);
 
             var results = '',
                 items = data.value.items,
@@ -79,9 +77,11 @@ var IRShopper = function() {
                 l = items.length;
 
             if (data.count) {
-                $('results').innerHTML = 'Processing ' + data.count + ' items...';
+                $('shop-announce-status').innerHTML = 'Processing ' + data.count + ' items...';
                 results += 'Found ' + data.count + ' items on eBay. Auctions ending sooner appear first.';
             }
+
+            //console.log(data);
 
             for (; i < l ; i++) {
                 var item = items[i];
@@ -89,6 +89,7 @@ var IRShopper = function() {
                 results += '<div class="' + CLASS.item + '">' + markup + '</div>';
             }
 
+            $('shop-announce-status').innerHTML = '';
             $('results-status').style.display = 'none';
 
             if (results) $('results').innerHTML = '<div class="clear"></div>' + results;
@@ -96,8 +97,8 @@ var IRShopper = function() {
             $('item').focus();
         };
 
-        if (typeof min !== 'number') min = 0;
-        if (typeof max !== 'number') max = 9999999;
+        if (min.charAt(0) === 'M') min = 0;
+        if (max.charAt(0) === 'M') max = 9999999;
 
         q = encodeURIComponent(q);
         min = encodeURIComponent(min);
@@ -283,11 +284,12 @@ h1, h2, h3 {
     <input type="text" id="max_price" value="" size="14">
     <input type="submit" value="Go!">
     <input type="button" value="Announce" id="shop-announce">
+    <span id="results-status" style="display:none;"></span>
     <span id="shop-announce-status"></span>
 </form>
 </div>
 <div id="listings">
-<div id="results-status" style="display:none;"></div>
+<div id="results-hd"></div>
 <div id="results">
 Loading application...
 </div>
