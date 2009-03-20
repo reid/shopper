@@ -1,0 +1,215 @@
+<script>
+var IRShopper = function() {
+
+    var ID = {
+        results: 'results',
+        searchForm: 'shop'
+    };
+
+    var CLASS = {
+        item: 'ebay-item'
+    };
+
+    var $ = function(el) {
+        return document.getElementById(el);
+    };
+
+    var onsubmit = function(e) {
+
+        e.preventDefault();
+
+        query(
+            $('item').value,
+            $('min_price').value,
+            $('max_price').value
+        );
+
+    };
+
+    var attachEvent = function(ev, el, cb) {
+        if (el.addEventListener) {
+            el.addEventListener(ev, cb, false);
+        } else if (el.attachEvent) {
+            el.attachEvent('on' + ev, cb);
+        }
+    };
+
+    var query = function(q, min, max) {
+
+        $('results').innerHTML = 'Fetching...';
+
+        var callback = function(req) {
+
+            $('results').innerHTML = 'Processing...';
+
+            var data = req.data;
+            if (!data) $('results').innerHTML = 'No items, try again?';
+
+            console.log(data);
+
+            var results = '',
+                items = data.value.items,
+                i = 0,
+                l = items.length;
+
+            if (data.count) {
+                $('results').innerHTML = 'Processing ' + data.count + ' items...';
+                results += 'Found ' + data.count + ' items on eBay.';
+            }
+
+            for (; i < l ; i++) {
+                var item = items[i];
+                var markup = item.description;
+                results += '<div class="' + CLASS.item + '">' + markup + '</div>';
+            }
+
+            if (results) $('results').innerHTML = results;
+
+            $('item').focus();
+        };
+
+        q = encodeURIComponent(q);
+        min = encodeURIComponent(min);
+        max = encodeURIComponent(max);
+
+        var url = 'http://pipes.yahoo.com/pipes/pipe.run?MaxPrice=' + max + '&MinPrice=' + min + '&_id=1c67a784df61eb40cf46224adf6f5011&_render=json&textinput1=' + q;
+
+        var params = {};
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.NONE;
+
+        gadgets.io.makeRequest(url, callback, params);
+    };
+
+    var announce = function() {
+
+        var callback = function(req) {
+            $('shop-announce-status').innerHTML = 'Posted!';
+        };
+
+        $('shop-announce-status').innerHTML = 'Posted!';
+
+        var activity = {},
+            item = $('item').value;
+
+        activity[opensocial.Activity.Field.TITLE] = 'Found a great deal on ' + item + ' using Shopper!';
+        activity[opensocial.Activity.Field.BODY] = 'Search eBay and get what you want with Shopper!';
+        activity[opensocial.Activity.Field.URL] = '';
+
+        opensocial.requestCreateActivity(
+            opensocial.newActivity(activity),
+            opensocial.CreateActivityPriority.HIGH,
+            callback
+        );
+
+    };
+
+    var init = function() {
+
+        $('results').innerHTML = 'Type an item!';
+
+        attachEvent('submit', $('shop'), onsubmit);
+
+        attachEvent('click', $('shop-announce'), announce);
+
+        $('item').focus();
+
+    };
+
+    return {
+        init: init
+    }; 
+
+}();
+
+gadgets.util.registerOnLoadHandler(IRShopper.init);
+
+</script>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#ir-app {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    padding: 0;
+}
+
+#hd {
+    color: #369;
+    background: #d4ebe0;
+    padding: 15px 15px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+#shopper {
+    padding: 5px;
+    margin: 0;
+}
+
+#shopper form {
+    margin: 0;
+}
+
+#ir-app h1 {
+    font-style: italic;
+}    
+
+#results {
+    padding: 3px 5px 3px;
+    border-top: 1px solid #ccc;
+}
+
+#ft {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 90%;
+    color: #bbb;
+}
+
+#ft a {
+    color: #bbb;
+}
+
+.ebay-item {
+    float: left;
+}
+
+.ebay-item td {
+    padding: 0;
+    margin: 0;
+    font-size: 70%;
+    display: block;
+}
+</style>
+<div id="ir-app">
+<div id="hd">
+<h1>Shopper!</h1>
+</div>
+<div id="bd">
+<div id="shopper">
+<form id="shop">
+    <label for="item">Item: </label>
+    <input type="text" id="item">
+    <label for="min_price">Min: $</label>
+    <input type="text" id="min_price" value="0">
+    <label for="max_price">Max: $</label>
+    <input type="text" id="max_price" value="100000">
+    <input type="submit" value="Go!">
+    <input type="button" value="Announce" id="shop-announce">
+    <span id="shop-announce-status"></span>
+</form>
+</div>
+<div id="results">
+Loading...
+</div>
+</div>
+<div id="ft">
+An IdeaRefuge App &mdash; Powered by Yahoo! Pipes, eBay, and YAP &mdash; &copy; 2009
+</div>
+</div>
