@@ -1,11 +1,6 @@
 <script>
 var IRShopper = function() {
 
-    var ID = {
-        results: 'results',
-        searchForm: 'shop'
-    };
-
     var CLASS = {
         item: 'ebay-item'
     };
@@ -61,12 +56,12 @@ var IRShopper = function() {
             return;
         }
 
-        $('results-status').style.display = 'inline';
-        $('shop-announce-status').innerHTML = 'Fetching...';
+        $('shopper-spinner').style.display = 'inline';
+        $('shopper-status').innerHTML = 'Fetching...';
 
         var callback = function(req) {
 
-            $('shop-announce-status').innerHTML = 'Processing...';
+            $('shopper-status').innerHTML = 'Processing...';
 
             var data = req.data;
             if (!data) $('results').innerHTML = 'No items, try again?';
@@ -77,11 +72,9 @@ var IRShopper = function() {
                 l = items.length;
 
             if (data.count) {
-                $('shop-announce-status').innerHTML = 'Processing ' + data.count + ' items...';
+                $('shopper-status').innerHTML = 'Processing ' + data.count + ' items...';
                 results += 'Found ' + data.count + ' items on eBay. Auctions ending sooner appear first.';
             }
-
-            //console.log(data);
 
             for (; i < l ; i++) {
                 var item = items[i];
@@ -89,8 +82,8 @@ var IRShopper = function() {
                 results += '<div class="' + CLASS.item + '">' + markup + '</div>';
             }
 
-            $('shop-announce-status').innerHTML = '';
-            $('results-status').style.display = 'none';
+            $('shopper-status').innerHTML = '';
+            $('shopper-spinner').style.display = 'none';
 
             if (results) $('results').innerHTML = '<div class="clear"></div>' + results;
 
@@ -116,16 +109,16 @@ var IRShopper = function() {
     var announce = function() {
 
         var callback = function(req) {
-            if (req.hadError()) $('shop-announce-status').innerHTML = 'Not shared, login first!';
+            if (req.hadError()) $('shopper-status').innerHTML = 'Not shared, login first!';
         };
 
-        $('shop-announce-status').innerHTML = 'Posted!';
+        $('shopper-status').innerHTML = 'Posted!';
 
         var activity = {},
             item = $('item').value;
 
         if (item.length === 0) {
-            $('shop-announce-status').innerHTML = 'Nothing to share!';
+            $('shopper-status').innerHTML = 'Nothing to share!';
             return;
         }
 
@@ -165,7 +158,7 @@ var IRShopper = function() {
         // ImageCache workaround
         var img = document.createElement('img');
         img.src = 'http://apps.idearefuge.com/spin.gif';
-        $('results-status').appendChild(img);
+        $('shopper-spinner').appendChild(img);
 
         $('item').focus();
 
@@ -193,6 +186,10 @@ body {
 h1, h2, h3 {
     margin: 0;
     padding: 0;
+}
+
+a {
+    color: #369;
 }
 
 #hd {
@@ -269,39 +266,41 @@ h1 {
     display: none;
 }
 
-#results-status {
+#shopper-spinner {
     margin: 5px auto;
     text-align: center;
 }
 </style>
 <div id="ir-app">
 <div id="hd">
-<h1>Shopper!</h1>
-<span>Fast visual eBay shopping</span>
+    <h1>Shopper!</h1>
+    <span>Fast visual eBay shopping</span>
 </div>
 <div id="bd">
-<div id="shopper">
-<form id="shop">
-    <label for="item">Find: </label>
-    <input type="text" id="item">
-    <label for="min_price" class="hide">Min: $</label>
-    <input type="text" id="min_price" value="" size="14">
-    <label for="max_price" class="hide">Max: $</label>
-    <input type="text" id="max_price" value="" size="14">
-    <input type="submit" value="Go!">
-    <input type="button" value="Announce" id="shop-announce">
-    <span id="results-status" style="display:none;"></span>
-    <span id="shop-announce-status"></span>
-</form>
-</div>
-<div id="listings">
-<div id="results-hd"></div>
-<div id="results">
-Loading application...
-</div>
-</div>
+    <div id="shopper">
+    <form id="shop">
+            <label for="item">Find: </label>
+            <input type="text" id="item">
+            <label for="min_price" class="hide">Min: $</label>
+            <input type="text" id="min_price" value="" size="15">
+            <label for="max_price" class="hide">Max: $</label>
+            <input type="text" id="max_price" value="" size="15">
+            <input type="submit" value="Go!">
+            <input type="button" value="Announce" id="shop-announce">
+            <span id="shopper-spinner" style="display:none;"></span>
+            <span id="shopper-status"></span>
+        </form>
+    </div>
+    <div id="listings">
+        <div id="results">
+            Loading...
+        </div>
+    </div>
 </div>
 <div id="ft">
-An IdeaRefuge App &mdash; Powered by Yahoo! Pipes, eBay, and YAP &mdash; &copy; 2009
+    A hack by <a href="http://reidburke.com/">Reid Burke</a>
+    &mdash; <a href="http://github.com/reid/shopper">Source on GitHub</a>
+    &mdash; <a href="http://pipes.yahoo.com/">Yahoo! Pipes</a>, <a href="http://ebay.com/">eBay</a>, and <a href="http://developer.yahoo.com/yap/">YAP</a>
+    &mdash; &copy; 2009
 </div>
 </div>
