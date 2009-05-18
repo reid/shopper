@@ -54,14 +54,31 @@ var IRShopper = function () {
         $('shopper-spinner').style.display = 'inline';
         $('shopper-status').innerHTML = 'Fetching...';
 
-        var callback = function(req) {
+        var callback = function (req) {
 
             $('shopper-status').innerHTML = 'Processing...';
 
-            var data = req.data;
-            if (!data) $('results').innerHTML = 'No items, try again?';
+            var complete = function (results) {
 
-            var results = '',
+                if (!results) {
+                    results = 'No items, try again?';
+                } else {
+                    results = '<div class="clear"></div>' + results;
+                }
+
+                $('results').innerHTML = results;
+                $('shopper-status').innerHTML = '';
+                $('shopper-spinner').style.display = 'none';
+                $('item').focus();
+
+            };
+
+            if (
+                req.hadError() || !req.hasOwnProperty("data") || !req.data
+            ) return complete(false);
+
+            var data = req.data,
+                results = '',
                 items = data.value.items,
                 i = 0,
                 l = items.length;
@@ -77,12 +94,8 @@ var IRShopper = function () {
                 results += '<div class="ebay-item">' + markup + '</div>';
             }
 
-            $('shopper-status').innerHTML = '';
-            $('shopper-spinner').style.display = 'none';
+            complete(results);
 
-            if (results) $('results').innerHTML = '<div class="clear"></div>' + results;
-
-            $('item').focus();
         };
 
         if (min.charAt(0) === 'M') min = 0;
@@ -165,9 +178,9 @@ var IRShopper = function () {
 
         if (defaults.hasOwnProperty("query")) {
             $('item').value = defaults.query;
-            // $('shop').submit() has problems, so we use our
-            // own function shared by the submit handler
-            submit();
+            // Invoking submit immediately causes unexpected behavior.
+            // setTimeout makes submit work as expected.
+            window.setTimeout(submit, 0);
             return;
         }
 
