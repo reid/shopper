@@ -1,3 +1,17 @@
+<style>
+    /* Hack for My Yahoo!, which constricts
+        the .yap-app div to 294px using a style
+        attribute. Override to 100% to make our
+        #hd div span the entire width of the
+        module container. */
+    .yap-app { width: 100% !important; }
+</style>
+<!-- Use style attributes to workaround a WebKit bug,
+     where dynamically inserted style tags are not
+     rendered unless they are in the document head,
+     which they won't be in My Yahoo!
+     NB: The .yap-app hack above won't work in WebKit
+ -->
 <div id="ir-app" style="
     font-family: Helvetica, Arial, sans-serif;
     margin: 0;
@@ -28,7 +42,7 @@
     padding: 5px;
     margin: 0;
 ">
-    <yml:form view="YahooFullView" method="GET">
+    <yml:form view="YahooFullView" params="canvas.php" method="GET">
         <label for="q">Find: </label>
         <input type="text" id="q" name="q">
         <input type="submit" value="Go!">
