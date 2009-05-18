@@ -1,6 +1,8 @@
 <script>
 var IRShopper = function () {
 
+    var query;
+
     var $ = function (el) {
         return document.getElementById(el);
     };
@@ -129,6 +131,10 @@ var IRShopper = function () {
 
     };
 
+    var setQuery = function (q) {
+        query = q;
+    };
+
     var init = function () {
 
         $('results').innerHTML = 'Type an item!';
@@ -155,8 +161,13 @@ var IRShopper = function () {
         img.src = 'http://apps.idearefuge.com/spin.gif';
         $('shopper-spinner').appendChild(img);
 
-        $('item').focus();
+        if (query) {
+            $('item').value = query;
+            $('shop').submit();
+            return;
+        }
 
+        $('item').focus();
     };
 
     return {

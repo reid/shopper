@@ -1,0 +1,49 @@
+<style>
+#ir-app {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+h1, #ir-app {
+    margin: 0;
+    padding: 0;
+}
+
+#hd {
+    color: #369;
+    background: #d4ebe0;
+    padding: 15px 15px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+h1 {
+    letter-spacing: -1px;
+}
+
+#ir-app h1, #hd span {
+    font-style: italic;
+    display: inline;
+    padding-right: 5px;
+}   
+
+#shopper {
+    padding: 5px;
+    margin: 0;
+}
+
+#shopper form {
+    margin: 0;
+}
+</style>
+<div id="ir-app">
+<div id="hd">
+    <h1>Shopper</h1> 
+    <span>Fast visual eBay shopping</span>
+</div>
+<div id="shopper">
+    <yml:form view="YahooFullView" method="GET">
+        <label for="q">Find: </label>
+        <input type="text" id="q" name="q">
+        <input type="submit" value="Go!">
+    </yml:form>
+</div>
+</div>
