@@ -36,9 +36,7 @@ var IRShopper = function () {
         });
     };
 
-    var onsubmit = function (e) {
-        e.preventDefault();
-
+    var submit = function () {
         query(
             $('item').value,
             $('min_price').value,
@@ -139,7 +137,11 @@ var IRShopper = function () {
 
         $('results').innerHTML = 'Type an item!';
 
-        attachEvent('submit', $('shop'), onsubmit);
+        attachEvent('submit', $('shop'), function (e) {
+            e.preventDefault();
+            submit();
+        });
+
         attachEvent('click', $('shop-announce'), announce);
 
         defaultInput({
@@ -163,7 +165,9 @@ var IRShopper = function () {
 
         if (defaults.hasOwnProperty("query")) {
             $('item').value = defaults.query;
-            $('shop').submit();
+            // $('shop').submit() has problems, so we use our
+            // own function shared by the submit handler
+            submit();
             return;
         }
 
