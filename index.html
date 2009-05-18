@@ -1,7 +1,7 @@
 <script>
 var IRShopper = function () {
 
-    var query;
+    var defaults = {};
 
     var $ = function (el) {
         return document.getElementById(el);
@@ -132,7 +132,7 @@ var IRShopper = function () {
     };
 
     var setQuery = function (q) {
-        query = q;
+        defaults.query = q;
     };
 
     var init = function () {
@@ -161,8 +161,8 @@ var IRShopper = function () {
         img.src = 'http://apps.idearefuge.com/spin.gif';
         $('shopper-spinner').appendChild(img);
 
-        if (query) {
-            $('item').value = query;
+        if (defaults.hasOwnProperty("query")) {
+            $('item').value = defaults.query;
             $('shop').submit();
             return;
         }
