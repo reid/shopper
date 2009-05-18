@@ -74,25 +74,28 @@ var IRShopper = function () {
             };
 
             if (
-                req.hadError() || !req.hasOwnProperty("data") || !req.data
+                !req.hasOwnProperty("data") || !req.data
             ) return complete(false);
 
             var data = req.data,
                 results = '',
+                auctions = [],
                 items = data.value.items,
                 i = 0,
                 l = items.length;
 
-            if (data.count) {
-                $('shopper-status').innerHTML = 'Processing ' + data.count + ' items...';
-                results += 'Found ' + data.count + ' items on eBay. Auctions ending sooner appear first.';
-            }
+            if (!data.count) complete(false);
 
-            for (; i < l ; i++) {
-                var item = items[i];
-                var markup = item.description;
-                results += '<div class="ebay-item">' + markup + '</div>';
-            }
+            $('shopper-status').innerHTML = 'Processing ' + data.count + ' items...';
+
+            results += 'Found ' + data.count + ' items on eBay. Auctions ending sooner appear first.';
+
+            for (; i < l ; i++) auctions.push(items[i].description);
+
+            var START = '<div class="ebay-item">',
+                END = '</div>';
+
+            results += START + auctions.join(END + START) + END;
 
             complete(results);
 
