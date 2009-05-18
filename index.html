@@ -1,15 +1,11 @@
 <script>
-var IRShopper = function() {
+var IRShopper = function () {
 
-    var CLASS = {
-        item: 'ebay-item'
-    };
-
-    var $ = function(el) {
+    var $ = function (el) {
         return document.getElementById(el);
     };
 
-    var attachEvent = function(ev, el, cb) {
+    var attachEvent = function (ev, el, cb) {
         if (el.addEventListener) {
             el.addEventListener(ev, cb, false);
         } else if (el.attachEvent) {
@@ -38,8 +34,7 @@ var IRShopper = function() {
         });
     };
 
-
-    var onsubmit = function(e) {
+    var onsubmit = function (e) {
         e.preventDefault();
 
         query(
@@ -49,7 +44,7 @@ var IRShopper = function() {
         );
     };
 
-    var query = function(q, min, max) {
+    var query = function (q, min, max) {
 
         if (q.length === 0) {
             $('results').innerHTML = 'Please supply an item name!';
@@ -79,7 +74,7 @@ var IRShopper = function() {
             for (; i < l ; i++) {
                 var item = items[i];
                 var markup = item.description;
-                results += '<div class="' + CLASS.item + '">' + markup + '</div>';
+                results += '<div class="ebay-item">' + markup + '</div>';
             }
 
             $('shopper-status').innerHTML = '';
@@ -106,9 +101,9 @@ var IRShopper = function() {
         gadgets.io.makeRequest(url, callback, params);
     };
 
-    var announce = function() {
+    var announce = function () {
 
-        var callback = function(req) {
+        var callback = function (req) {
             if (req.hadError()) $('shopper-status').innerHTML = 'Not shared, login first!';
         };
 
@@ -134,7 +129,7 @@ var IRShopper = function() {
 
     };
 
-    var init = function() {
+    var init = function () {
 
         $('results').innerHTML = 'Type an item!';
 
@@ -298,7 +293,7 @@ h1 {
     </div>
 </div>
 <div id="ft">
-    A hack by <a href="http://reidburke.com/">Reid Burke</a>
+    A <a href="http://reidburke.com/">Reid Burke</a> App
     &mdash; <a href="http://github.com/reid/shopper">Source on GitHub</a>
     &mdash; <a href="http://pipes.yahoo.com/">Yahoo! Pipes</a>, <a href="http://ebay.com/">eBay</a>, and <a href="http://developer.yahoo.com/yap/">YAP</a>
     &mdash; &copy; 2009
